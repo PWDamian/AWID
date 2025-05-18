@@ -35,11 +35,11 @@ function (layer::Dense)(input::GraphNode)::GraphNode # Czyni obiekty Dense "wywo
 end
 
 struct Chain
-    layers::Tuple
+    layers::Tuple{Vararg{Dense}}
 end
 
 # Konstruktor dla Chain, przyjmuje zmienną liczbę warstw
-Chain(layers...) = Chain(layers)
+Chain(layers::Vararg{Dense}) = Chain((layers...,))
 
 # Przejście w przód dla Chain
 function (chain::Chain)(input::GraphNode)::GraphNode # Czyni obiekty Chain "wywoływalnymi": model(x)

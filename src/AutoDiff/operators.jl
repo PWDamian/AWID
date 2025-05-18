@@ -79,13 +79,13 @@ Base.Broadcast.broadcasted(::typeof(log), x::GraphNode) = BroadcastedOperator(lo
 forward(::BroadcastedOperator{typeof(log)}, x) = return log.(x)
 backward(::BroadcastedOperator{typeof(log)}, x, g) = tuple(g ./ (x))
 
-function σ_internal(x::Real)
-    return 1 / (1 + exp(-x))
+function σ_internal(x)
+    return 1.0f0 ./ (1.0f0 .+ exp.(-x))
 end
-σ(x::GraphNode) = ScalarOperator(σ_internal, x) # sigmoid
-forward(::ScalarOperator{typeof(σ_internal)}, x) = return σ_internal(x)
-backward(op::ScalarOperator{typeof(σ_internal)}, x, g) =
+σ(x::GraphNode) = BroadcastedOperator(σ_internal, x) # sigmoid
+forward(::BroadcastedOperator{typeof(σ_internal)}, x) = return σ_internal(x)
+backward(node::BroadcastedOperator{typeof(σ_internal)}, x, g) =
     let
-        y = op.output # użycie wyniku z przejścia forward
-        tuple(g * y * (1 - y))
+        y = node.output # użycie wyniku z przejścia forward
+        tuple(g .* y .* (1.0f0 .- y))
     end

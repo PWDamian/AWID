@@ -29,16 +29,6 @@
             backward!(order)
             @test x.gradient ≈ cos(0.5)
         end
-
-        @testset "Sigmoid (σ)" begin
-            x_sig = Variable(0.5)
-            s = σ(x_sig)
-            order = topological_sort(s)
-            expected_forward_result = 1 / (1 + exp(-0.5))
-            @test forward!(order) ≈ expected_forward_result
-            backward!(order)
-            @test x_sig.gradient ≈ expected_forward_result * (1 - expected_forward_result)
-        end
     end
 
     @testset "BroadcastedOperator" begin
@@ -159,6 +149,18 @@
             @test forward!(order) ≈ (log(x1) + log(x2))
             backward!(order)
             @test x.gradient ≈ [1 / x1, 1 / x2]
+        end
+
+        @testset "Sigmoid (σ)" begin
+            x = Float32[0.5, -0.2, 0.0]
+            x_sig = Variable(x)
+            z = σ(x_sig)
+            s = sum(z)
+            order = topological_sort(s)
+            expected_forward_result = 1.0f0 ./ (1.0f0 .+ exp.(-x))
+            @test forward!(order) ≈ sum(expected_forward_result)
+            backward!(order)
+            @test x_sig.gradient ≈ (expected_forward_result .* (1.0f0 .- expected_forward_result))
         end
     end
 
