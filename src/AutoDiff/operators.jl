@@ -75,9 +75,9 @@ backward(node::BroadcastedOperator{typeof(softmax)}, x, g) =
     end
 
 import Base: log
-log(x::GraphNode) = ScalarOperator(log, x) # potrzebny do binarycrossentropy
-forward(::ScalarOperator{typeof(log)}, x) = return log(x)
-backward(::ScalarOperator{typeof(log)}, x, g) = tuple(g / x)
+Base.Broadcast.broadcasted(::typeof(log), x::GraphNode) = BroadcastedOperator(log, x) # potrzebny do binarycrossentropy
+forward(::BroadcastedOperator{typeof(log)}, x) = return log.(x)
+backward(::BroadcastedOperator{typeof(log)}, x, g) = tuple(g ./ (x))
 
 function σ_internal(x::Real)
     return 1 / (1 + exp(-x))
