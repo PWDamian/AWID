@@ -3,7 +3,7 @@ import Base: show # import potrzebny, bo dodajemy własne metody show do funkcji
 abstract type GraphNode end
 abstract type Operator <: GraphNode end # reprezentuje operacje matematyczne (<: = dziedziczenie)
 
-struct Constant{T} <: GraphNode
+mutable struct Constant{T} <: GraphNode
     output::T # gradient = 0
 end
 

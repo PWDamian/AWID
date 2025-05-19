@@ -81,14 +81,14 @@
 
         @testset "Element-wise Division (./)" begin
             x1 = Variable([10.0, 20.0])
-            x2 = Variable(2.0)
+            x2 = Variable([2.0, 3.0])
             z = x1 ./ x2
             s = sum(z)
             order = topological_sort(s)
-            @test forward!(order) ≈ 10.0 / 2.0 + 20.0 / 2.0
+            @test forward!(order) ≈ 10.0 / 2.0 + 20.0 / 3.0
             backward!(order)
-            @test x1.gradient ≈ [1.0 / 2.0, 1.0 / 2.0]
-            @test x2.gradient ≈ -10.0 / (2.0^2) + -20.0 / (2.0^2)
+            @test x1.gradient ≈ [1.0 / 2.0, 1.0 / 3.0]
+            @test x2.gradient ≈ [-10.0 / (2.0^2), -20.0 / (3.0^2)]
         end
 
         @testset "Matrix-Vector Multiplication (*)" begin

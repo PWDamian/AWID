@@ -9,17 +9,18 @@ struct Dense
     activation_fn::Function
 end
 
-function default_weight_init(dims...)
-    return randn(Float32, dims...)
+function init_xavier_glorot(in_dim, out_dim)
+    scale = sqrt(6f0 / (in_dim + out_dim))
+    return rand(Float32, out_dim, in_dim) .* 2f0 .* scale .- scale
 end
 
-function default_bias_init(dims...)
+function init_zeros(dims...)
     return zeros(Float32, dims...)
 end
 
 # Konstruktor dla Dense
-function Dense(input_size::Int, output_size::Int, activation_fn::Function; init_W::Function=default_weight_init, init_b::Function=default_bias_init)
-    W_values = init_W(output_size, input_size) # najpierw output_size, potem input_size, żeby pasowało do W * x
+function Dense(input_size::Int, output_size::Int, activation_fn::Function; init_W::Function=init_xavier_glorot, init_b::Function=init_zeros)
+    W_values = init_W(input_size, output_size)
     b_values = init_b(output_size)
     W = Variable(W_values)
     b = Variable(b_values)
@@ -63,6 +64,6 @@ function parameters(chain::Chain)
     return all_params
 end
 
-export Dense, Chain, parameters
+export Dense, Chain, parameters, init_xavier_glorot, init_zeros
 
 end

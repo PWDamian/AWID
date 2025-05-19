@@ -20,19 +20,10 @@ function _binary_crossentropy_graph(ŷ::GraphNode, y::GraphNode, batch_size_val:
     return mean_loss_node
 end
 
-function binary_crossentropy(model::Layers.Chain, x_data::AbstractArray, y_data::AbstractArray; epsilon::Float32=eps(Float32))
-    x_node = Variable(x_data)
-    y_node = Constant(y_data) # stałe cele
-
+function binary_crossentropy(model::Layers.Chain, x_node::GraphNode, y_node::GraphNode; batch_size::Int, epsilon::Float32=eps(Float32))
     y_pred_node = model(x_node)
 
-    if ndims(y_data) == 1 # obsługa, gdy y_data to wektor
-        batch_size = length(y_data)
-    else # obsługa, gdy y_data to macierz 1xN
-        batch_size = size(y_data, 2)
-    end
-
-    return _binary_crossentropy_graph(y_pred_node, y_node, batch_size; epsilon=epsilon)
+    return _binary_crossentropy_graph(y_pred_node, y_node, batch_size; epsilon=epsilon), y_pred_node
 end
 
 export binary_crossentropy

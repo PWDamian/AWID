@@ -86,7 +86,7 @@
             x_data_batch = Float32[1.5 0.5; 2.5 -0.5] # Paczka 2 próbek po 2 cechy
             y_true_batch = Float32[1.0 0.0]  # Etykiety dla paczki
 
-            loss_node = binary_crossentropy(model, x_data_batch, y_true_batch)
+            loss_node, _ = binary_crossentropy(model, x_data_batch, y_true_batch)
             order = topological_sort(loss_node)
             loss = forward!(order)
 
