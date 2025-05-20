@@ -18,7 +18,7 @@ mutable struct Adam
     end
 end
 
-function update!(opt::Adam, params::Vector{Variable})
+function update!(opt::Adam, params::Vector{<:Variable})
     opt.t += 1
 
     for p in params

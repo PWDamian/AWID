@@ -7,11 +7,11 @@ mutable struct Constant{T} <: GraphNode
     output::T # gradient = 0
 end
 
-mutable struct Variable <: GraphNode
-    output::Any # input = output
+mutable struct Variable{T} <: GraphNode
+    output::T
     gradient::Any
     name::String
-    Variable(output; name="?") = new(output, nothing, name) # constructor
+    Variable(output::T, name="?") where T = new{T}(output, nothing, name)
 end
 
 mutable struct ScalarOperator{F} <: Operator

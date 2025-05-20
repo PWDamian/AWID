@@ -79,36 +79,19 @@
 
     @testset "Losses" begin
         @testset "BinaryCrossEntropy" begin
-            W = Float32[0.5 -0.8] # Wagi (1 neuron, 2 cechy)
-            b = Float32[0.1]
-            layer = Dense(Variable(W), Variable(b), sigmoid)
-            model = Chain(layer)
-            x_data_batch = Float32[1.5 0.5; 2.5 -0.5] # Paczka 2 próbek po 2 cechy
-            y_true_batch = Float32[1.0 0.0]  # Etykiety dla paczki
+            y_hat = 0.6899745f0 # Przykładowe prawdopodobieństwo
+            y_true = 1.0f0
 
-            loss_node, _ = binary_crossentropy(model, x_data_batch, y_true_batch)
+            y_hat_node = Variable(y_hat)
+            y_true_node = Constant(y_true) # Constant, bo nie podlega optymalizacji (stały cel)
+
+            epsilon = eps(Float32)
+            loss_node = binary_crossentropy(y_hat_node, y_true_node, batch_size=1, epsilon=epsilon) # batch_size=1, bo test dla 1 próbki
             order = topological_sort(loss_node)
             loss = forward!(order)
 
-            # Próbka 1 (x_p1 = [1.5; 2.5]):
-            # affine_p1 = W * [1.5; 2.5] .+ b = [0.5 -0.8] * [1.5; 2.5] .+ [0.1] = [-1.15]
-            affine_p1_manual = -1.15f0
-            y_hat_p1_manual = 1.0f0 / (1.0f0 + exp(-affine_p1_manual)) # σ(-1.15) ≈ 0.2405
-
-            # Próbka 2 (x_p2 = [0.5; -0.5]):
-            # affine_p2 = W * [0.5; -0.5] .+ b = [0.5 -0.8] * [0.5; -0.5] .+ [0.1] = [0.75]
-            affine_p2_manual = 0.75f0
-            y_hat_p2_manual = 1.0f0 / (1.0f0 + exp(-affine_p2_manual)) # σ(0.75) ≈ 0.6792
-
-            epsilon = eps(Float32)
-            batch_size = 2
-            loss_p1 = -(1.0f0 * log(y_hat_p1_manual + epsilon) +
-                        (1.0f0 - 1.0f0) * log(1.0f0 - y_hat_p1_manual + epsilon))
-
-            loss_p2 = -(0.0f0 * log(y_hat_p2_manual + epsilon) +
-                        (1.0f0 - 0.0f0) * log(1.0f0 - y_hat_p2_manual + epsilon))
-            expected_mean_loss = (loss_p1 + loss_p2) / Float32(batch_size)
-            @test loss ≈ expected_mean_loss
+            expected_loss = -(y_true * log(y_hat + epsilon) + (1.0f0 - y_true) * log(1.0f0 - y_hat + epsilon))
+            @test loss ≈ expected_loss
         end
     end
 
