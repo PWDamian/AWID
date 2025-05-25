@@ -1,6 +1,6 @@
 using Test
-using MLP.AutoDiff
-using MLP.NeuralNetwork
+using AWID.AutoDiff
+using AWID.NeuralNetwork
 
 @testset "Tests" begin
     include("test_autodiff.jl")

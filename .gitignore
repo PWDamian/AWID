@@ -1,1 +1,2 @@
-data/imdb_dataset_prepared*
+data/**/imdb_dataset_prepared.jld2
+data/glove_6B_50d.jld2
