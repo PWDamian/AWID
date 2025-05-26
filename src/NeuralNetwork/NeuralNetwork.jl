@@ -10,8 +10,8 @@ include("metrics.jl")
 include("training.jl")
 include("dataloader.jl")
 
-using .Layers: Dense, Chain, parameters, init_xavier_glorot, init_zeros
-export Dense, Chain, parameters, init_xavier_glorot, init_zeros
+using .Layers: Dense, Chain, parameters, init_xavier_glorot, init_zeros, Conv, MaxPool, Flatten, Permute, Embedding
+export Dense, Chain, parameters, init_xavier_glorot, init_zeros, Conv, MaxPool, Flatten, Permute, Embedding
 
 using .Activations: relu, sigmoid
 export relu, sigmoid
