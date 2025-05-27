@@ -12,12 +12,13 @@ function get_epoch_batches(X_data, Y_data; batch_size::Int, do_shuffle::Bool=fal
 
     num_batches_for_epoch = ceil(Int, num_samples / batch_size)
 
-    return ( # To jest generator, który zwraca iterator, który zwraca batche
+    return (
         (
             X_data[:, indices[(i-1)*batch_size+1:min(i * batch_size, num_samples)]],
             Y_data[:, indices[(i-1)*batch_size+1:min(i * batch_size, num_samples)]]
         )
         for i in 1:num_batches_for_epoch
+        if min(i * batch_size, num_samples) >= (i-1)*batch_size+1 # Only yield non-empty batches
     )
 end
 

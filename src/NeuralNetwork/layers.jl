@@ -81,6 +81,8 @@ end
 
 # Przejście w przód dla warstwy Dense
 function (layer::Dense)(input::GraphNode)::GraphNode # Czyni obiekty Dense "wywoływalnymi": dense_layer(x)
+    println("layer: Dense")
+    println("input: ", size(input.output))
     # input.output to macierz cech (n_features np. 17703 - liczba cech z TF-IDF, n_samples_in_batch np. 64)
     affine_transformation = (layer.W * input) .+ layer.b
     return layer.activation_fn(affine_transformation)
@@ -88,6 +90,8 @@ end
 
 # Przejście w przód dla warstwy Conv
 function (layer::Conv)(input::GraphNode)::GraphNode
+    println("layer: Conv")
+    println("input: ", size(input.output))
     # Perform convolution
     # For simplicity, we'll use a basic convolution implementation
     # This is a simplified version and might need to be optimized
@@ -106,13 +110,18 @@ function (layer::Conv)(input::GraphNode)::GraphNode
             output[:,:,:,j,i] .+= layer.b.output[j]
         end
     end
-    
     # Apply activation function
-    return layer.activation_fn(Variable(output))
+    ooo =layer.activation_fn(Variable(output))
+    println("layer.activation_fn: ", layer.activation_fn)
+    println("ooo: ", ooo)
+    println("ooo: ", ooo.output)
+    return ooo
 end
 
 # Przejście w przód dla warstwy MaxPool
 function (layer::MaxPool)(input::GraphNode)::GraphNode
+    println("layer: MaxPool")
+    println("input: ", size(input.output))
     # Get input size from the output of the operator
     input_size = size(input.output)
     
@@ -138,6 +147,8 @@ end
 
 # Przejście w przód dla warstwy Flatten
 function (layer::Flatten)(input::GraphNode)::GraphNode
+    println("layer: Flatten")
+    println("input: ", size(input.output))
     # Reshape the input to a 2D matrix where each column is a flattened sample
     input_size = size(input.output)
     flattened_size = prod(input_size[1:end-1])  # All dimensions except the last (batch) dimension
@@ -147,15 +158,17 @@ end
 
 # Przejście w przód dla warstwy Permute
 function (layer::Permute)(input::GraphNode)::GraphNode
+    println("layer: Permute")
+    println("input: ", size(input.output))
     # Permute the dimensions of the input tensor
-    println("Permute: ", layer.dims)
-    println("Input: ", input.output)
     output = permutedims(input.output, layer.dims)
     return Variable(output)
 end
 
 # Przejście w przód dla warstwy Embedding
 function (layer::Embedding)(input::GraphNode)::GraphNode
+    println("layer: Embedding")
+    println("input: ", size(input.output))
     # For a single index
     if ndims(input.output) == 1
         return Variable(layer.W.output[:, input.output])
