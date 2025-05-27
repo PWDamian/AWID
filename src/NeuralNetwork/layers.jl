@@ -113,7 +113,9 @@ end
 
 # Przejście w przód dla warstwy MaxPool
 function (layer::MaxPool)(input::GraphNode)::GraphNode
+    # Get input size from the output of the operator
     input_size = size(input.output)
+    
     # Calculate output size based on input size, kernel size, and stride
     output_size = Tuple(
         ceil(Int, (input_size[i] - layer.kernel_size[i] + 1) / layer.stride[i])
@@ -159,20 +161,25 @@ function (layer::Embedding)(input::GraphNode)::GraphNode
         return Variable(layer.W.output[:, input.output])
     end
     
-    # For a batch of indices
+    # For a batch of indices (sequence_length x batch_size)
     if ndims(input.output) == 2
-        batch_size = size(input.output, 2)
+        sequence_length, batch_size = size(input.output)
         embedding_dim = size(layer.W.output, 1)
-        output = zeros(Float32, embedding_dim, batch_size)
+        output = zeros(Float32, embedding_dim, sequence_length, batch_size)
         
-        for i in 1:batch_size
-            output[:, i] = layer.W.output[:, input.output[i]]
+        for i in 1:sequence_length
+            for j in 1:batch_size
+                idx = input.output[i, j]
+                if idx > 0  # Skip padding tokens
+                    output[:, i, j] = layer.W.output[:, idx]
+                end
+            end
         end
         
         return Variable(output)
     end
     
-    # For higher dimensional inputs (e.g., sequences of indices)
+    # For higher dimensional inputs
     if ndims(input.output) > 2
         input_size = size(input.output)
         embedding_dim = size(layer.W.output, 1)
@@ -184,7 +191,10 @@ function (layer::Embedding)(input::GraphNode)::GraphNode
         flat_output = zeros(Float32, embedding_dim, size(flat_input, 2))
         
         for i in 1:size(flat_input, 2)
-            flat_output[:, i] = layer.W.output[:, flat_input[i]]
+            idx = flat_input[i]
+            if idx > 0  # Skip padding tokens
+                flat_output[:, i] = layer.W.output[:, idx]
+            end
         end
         
         # Reshape back to original dimensions
