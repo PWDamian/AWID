@@ -28,7 +28,6 @@ using AWID.NeuralNetwork, AWID.AutoDiff
 
 model = Chain(
     Embedding(length(vocab), embedding_dim),
-    Permute((2,1,3)),
     Conv((3,), embedding_dim, 8, relu),
     MaxPool((8,)),
     Flatten(),

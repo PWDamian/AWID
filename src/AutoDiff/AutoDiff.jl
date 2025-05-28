@@ -12,4 +12,6 @@ export topological_sort, forward!, backward!
 
 export σ, softmax
 
+export embedding_op, conv_op, maxpool_op, flatten_op
+
 end
