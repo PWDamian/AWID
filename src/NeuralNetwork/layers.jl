@@ -10,8 +10,6 @@ struct Dense
 end
 
 struct Conv
-    W::Variable  # weights/kernel
-    b::Variable  # bias
     kernel_size::Constant
     in_channels::Constant
     out_channels::Constant
@@ -53,18 +51,9 @@ function Dense(input_size::Int, output_size::Int, activation_fn::Function; init_
 end
 
 # Konstruktor dla Conv
-function Conv(kernel_size::Tuple{Vararg{Int}}, in_channels::Int, out_channels::Int, activation_fn::Function; init_W::Function=init_xavier_glorot, init_b::Function=init_zeros)
-    # Initialize weights with Xavier/Glorot initialization
-    W_shape = (kernel_size..., in_channels, out_channels)
-    W_values = init_W(prod(kernel_size) * in_channels, out_channels)
-    W_values = reshape(W_values, W_shape...)
-    W = Variable(W_values)
+function Conv(kernel_size::Tuple{Vararg{Int}}, in_channels::Int, out_channels::Int, activation_fn::Function)
     
-    # Initialize bias
-    b_values = init_b(out_channels)
-    b = Variable(b_values)
-    
-    return Conv(W, b, Constant(kernel_size), Constant(in_channels), Constant(out_channels), activation_fn)
+    return Conv(Constant(kernel_size), Constant(in_channels), Constant(out_channels), activation_fn)
 end
 
 # Konstruktor dla MaxPool
@@ -91,7 +80,7 @@ end
 function (layer::Conv)(input::GraphNode)::GraphNode
     println("layer: Conv")
     
-    return layer.activation_fn(conv_op(layer.kernel_size, layer.in_channels, layer.out_channels, layer.W, layer.b, input))
+    return layer.activation_fn(conv_op(layer.kernel_size, input))
 end
 
 # Przejście w przód dla warstwy MaxPool

@@ -133,31 +133,23 @@ forward(::BroadcastedOperator, W, x) = begin
 end
 backward(::BroadcastedOperator, W, x, g) = tuple(g, sum(g, dims=2))
 
-conv_op(kernel_size::Constant, in_channels::Constant, out_channels::Constant, W::GraphNode, b::GraphNode, x::GraphNode) =
-    BroadcastedOperator(conv_op, kernel_size, in_channels, out_channels, W, b, x)
-forward(::BroadcastedOperator{typeof(conv_op)}, kernel_size::Constant, in_channels::Constant, out_channels::Constant, W, b, x) = begin
+conv_op(kernel_size::Constant, x::GraphNode) = BroadcastedOperator(conv_op, kernel_size, x)
+forward(::BroadcastedOperator{typeof(conv_op)}, kernel_size::Constant, x) = begin
     println("layer: Conv forward")
+    x_height, x_width = size(x)
+    filter_height, filter_width, _, num_of_kernels = size(kernel)
 
+    output_height = x_height - filter_height + 1
+    output_width = x_width - filter_width + 1
 
-    # Perform convolution
-    # For simplicity, we'll use a basic convolution implementation
-    # This is a simplified version and might need to be optimized
-    input_size = size(x.output)
-    output_size = (input_size[1:end-2]..., out_channels, input_size[end])
-    output = zeros(Float32, output_size)
+    col_x = img2col(x, filter_height, filter_width, output_height, output_width)
+    col_kernel = reshape(kernel, :, num_of_kernels)'
+    output = zeros(Float32, num_of_kernels, output_height * output_width)
 
-    # Simple convolution implementation
-    for i in 1:input_size[end]  # batch dimension
-        for j in 1:out_channels
-            for k in 1:in_channels
-                # Apply convolution
-                # This is a simplified version - in practice, you'd want to use a more efficient implementation
-                output[:, :, :, j, i] .+= conv2d(x.output[:, :, :, k, i], W.output[:, :, :, k, j])
-            end
-            output[:, :, :, j, i] .+= b.output[j]
-        end
-    end
-    # Apply activation function
+    mul!(output, col_kernel, col_x)
+
+    output = reshape(output, num_of_kernels, output_height, output_width)
+    output = permutedims(output, (2, 3, 1))
     return Variable(output)
 end
 backward(::BroadcastedOperator{typeof(conv_op)}, W, x, g) = tuple(g, sum(g, dims=2))
