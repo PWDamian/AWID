@@ -2,6 +2,7 @@ name = "AWID"
 uuid = "7fb77206-3fc2-405f-8e52-f13d767db8c6"
 
 [deps]
+BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
 FileIO = "5789e2e9-d7fb-5bc7-8068-2c6fae9b9549"
 Flux = "587475ba-b771-5e3f-ad9e-33799f191a9c"
 IJulia = "7073ff75-c697-5162-941a-fcdaad2a7d2a"
@@ -14,6 +15,7 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 TextAnalysis = "a2db99b7-8b79-58f8-94bf-bbc811eef33d"
 
 [compat]
+BenchmarkTools = "1.6.0"
 FileIO = "1.17.0"
 Flux = "0.16.3"
 IJulia = "1.26.0"

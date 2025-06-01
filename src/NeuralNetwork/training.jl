@@ -2,9 +2,9 @@ module Training
 
 using ..AutoDiff: GraphNode, Constant, Variable, topological_sort, forward!, backward!
 using ..Layers: Chain, parameters
-using ..Optimizers: update!
+using ..Optimizers: Optimizer, update!
 
-function _train_on_batch(model::Chain, order::Vector, x_train_node::GraphNode, y_train_true_node::GraphNode, y_train_pred_node::GraphNode, accuracy_fn, optimizer, x_batch, y_batch)
+function _train_on_batch(model::Chain, order::Vector, x_train_node::GraphNode, y_train_true_node::GraphNode, y_train_pred_node::GraphNode, accuracy_fn, optimizer::Optimizer, x_batch, y_batch)
     x_train_node.output = x_batch
     y_train_true_node.output = y_batch
 
@@ -23,8 +23,8 @@ function _test_loss_and_accuracy(order::Vector, y_pred_node::GraphNode, accuracy
     return loss, accuracy
 end
 
-function setup_training_functions(; model::Chain, loss_fn, accuracy_fn, optimizer, x_test, y_test, batch_size::Int, epsilon::Float32=eps(Float32))
-    placeholder = Matrix{Float32}(undef, 0, 0)
+function setup_training_functions(; model::Chain, loss_fn::Function, accuracy_fn::Function, optimizer::Optimizer, x_test::AbstractArray{T}, y_test::AbstractArray, batch_size::Int, epsilon::Float32=eps(Float32)) where T
+    placeholder = Matrix{T}(undef, 0, 0)
     x_train_node = Variable(placeholder)
     y_train_true_node = Constant(placeholder)
     y_train_pred_node = model(x_train_node)

@@ -2,7 +2,9 @@ module Optimizers
 
 using ..AutoDiff: Variable
 
-mutable struct Adam
+abstract type Optimizer end
+
+mutable struct Adam <: Optimizer
     lr::Float32 # Współczynnik uczenia (learning rate)
     beta1::Float32
     beta2::Float32
@@ -52,6 +54,6 @@ function update!(opt::Adam, params::Vector{<:Variable})
     return nothing
 end
 
-export Adam, update!
+export Optimizer, Adam, update!
 
 end

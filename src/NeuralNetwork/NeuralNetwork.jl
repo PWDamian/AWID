@@ -2,7 +2,7 @@ module NeuralNetwork
 
 using ..AutoDiff
 
-include("layers.jl")
+include("Layers/Layers.jl")
 include("activations.jl")
 include("losses.jl")
 include("optimizers.jl")
@@ -10,8 +10,8 @@ include("metrics.jl")
 include("training.jl")
 include("dataloader.jl")
 
-using .Layers: Dense, Chain, parameters, init_xavier_glorot, init_zeros
-export Dense, Chain, parameters, init_xavier_glorot, init_zeros
+using .Layers: AbstractLayer, Dense, Embedding, Conv1D, MaxPool1D, Flatten, Chain, parameters, summary, init_xavier_glorot, init_xavier_glorot_conv1d, init_zeros
+export AbstractLayer, Dense, Embedding, Conv1D, MaxPool1D, Flatten, Chain, parameters, summary, init_xavier_glorot, init_xavier_glorot_conv1d, init_zeros
 
 using .Activations: relu, sigmoid
 export relu, sigmoid
@@ -19,8 +19,8 @@ export relu, sigmoid
 using .Losses: binary_crossentropy
 export binary_crossentropy
 
-using .Optimizers: Adam, update!
-export Adam, update!
+using .Optimizers: Optimizer, Adam, update!
+export Optimizer, Adam, update!
 
 using .Metrics: accuracy
 export accuracy

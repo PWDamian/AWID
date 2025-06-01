@@ -10,6 +10,6 @@ export GraphNode, Operator, Constant, Variable
 
 export topological_sort, forward!, backward!
 
-export σ, softmax
+export σ, softmax, embedding_lookup, conv1d, maxpool1d, flatten
 
 end

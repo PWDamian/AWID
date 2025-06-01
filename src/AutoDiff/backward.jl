@@ -7,7 +7,7 @@ update!(node::GraphNode, gradient) =
         node.gradient = node.gradient .+ gradient # (.+) - broadcast/elementwise
     end
 
-function backward!(order::Vector; seed=1.0)
+function backward!(order::Vector; seed::Float32=1.0f0)
     result = last(order)
     result.gradient = seed
     @assert length(result.output) == 1 "Gradient is defined only for scalar functions"
