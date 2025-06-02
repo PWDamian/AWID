@@ -1,6 +1,7 @@
 module AutoDiff
 
 include("types.jl")
+include("utils.jl")
 include("graph.jl")
 include("forward.jl")
 include("backward.jl")

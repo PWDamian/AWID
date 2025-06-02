@@ -75,6 +75,56 @@
             # d2_out = W2*d1_out + b2 = [2 0]*[1.1; 1.9] + [0.5] = [2.7]
             @test forward_result ≈ [2.7f0]
         end
+
+        @testset "Embedding Layer" begin
+            W = Float32[1 3 5; 2 4 6]  # embedding_dim=2, vocab_size=3
+            embedding_layer = Embedding(Variable(W))
+            input_indices = reshape([1, 3], 2, 1) # (sequence_length=2, batch_size=1)
+            input_node = Variable(input_indices)
+            output_node = embedding_layer(input_node)
+            expected = reshape(Float32[1, 2, 5, 6], 2, 2, 1) # (embedding_dim, sequence_length, batch_size)
+            @test forward!(topological_sort(output_node)) ≈ expected
+        end
+
+        @testset "Conv1D Layer" begin
+            W = reshape(Float32[1, 0, -1], 3, 1, 1) # kernel_width=3, in_channels=1, out_channels=1
+            b = Float32[0]
+            input = reshape(Float32[4, 2, 3, 4], 1, 4, 1) # in_channels=1, width=4, batch_size=1
+            conv = Conv1D(Variable(W), Variable(b), relu)
+            expected = zeros(Float32, 1, 2, 1)
+            expected[1, 1, 1] = 1 # max(4 * 1 + 2 * 0 + 3 * (-1), 0)
+            expected[1, 2, 1] = 0 # max(2 * 1 + 3 * 0 + 4 * (-1), 0)
+            @test out = forward!(topological_sort(conv(Variable(input)))) ≈ expected
+        end
+
+        @testset "MaxPool1D Layer" begin
+            pool = MaxPool1D(2)
+            input = Float32[
+                1 3 2 4 5 6;
+                7 7 7 7 7 7;
+                6 5 4 3 2 1
+            ]
+            input = reshape(input, 3, 6, 1)
+            input_node = Variable(input)
+            output_node = pool(input_node)
+            out = forward!(topological_sort(output_node))
+            expected = Float32[
+                3 4 6;
+                7 7 7;
+                6 4 2
+            ]
+            expected = reshape(expected, 3, 3, 1)
+            @test out ≈ expected
+        end
+
+        @testset "Flatten Layer" begin
+            layer = Flatten()
+            input = reshape(Float32[1, 2, 3, 4], 2, 2, 1)
+            input_node = Variable(input)
+            output_node = layer(input_node)
+            out = forward!(topological_sort(output_node))
+            @test out ≈ reshape(input, 4, 1)
+        end
     end
 
     @testset "Losses" begin

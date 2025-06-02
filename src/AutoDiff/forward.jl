@@ -5,7 +5,7 @@ reset!(node::Operator) = node.gradient = nothing
 compute!(node::Constant) = nothing
 compute!(node::Variable) = nothing
 compute!(node::Operator) =
-    node.output = forward(node, [input.output for input in node.inputs]...) # forward z operators.jl
+    node.output = forward(node, extract_input_values(node)...) # forward z operators.jl
 
 function forward!(order::Vector)
     for node in order

@@ -21,9 +21,8 @@ end
 function backward!(node::Constant) end
 function backward!(node::Variable) end
 function backward!(node::Operator)
-    inputs = node.inputs
-    gradients = backward(node, [input.output for input in inputs]..., node.gradient)
-    for (input, gradient) in zip(inputs, gradients)
+    gradients = backward(node, extract_input_values(node)..., node.gradient)
+    for (input, gradient) in zip(node.inputs, gradients)
         update!(input, gradient)
     end
     return nothing
