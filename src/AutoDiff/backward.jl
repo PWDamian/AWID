@@ -1,13 +1,13 @@
 # funkcje pomocnicze
-update!(node::Constant, gradient) = nothing
-update!(node::GraphNode, gradient) =
+update!(node::Constant{T}, gradient::S) where {T,S<:Union{AbstractArray{Float32},Float32,Nothing}} = nothing
+update!(node::GraphNode, gradient::S) where {S<:Union{AbstractArray{Float32},Float32,Nothing}} =
     if isnothing(node.gradient)
         node.gradient = gradient # pierwszy gradient dla tego węzła
     else
         node.gradient = node.gradient .+ gradient # (.+) - broadcast/elementwise
     end
 
-function backward!(order::Vector; seed::Float32=1.0f0)
+function backward!(order::Vector{GraphNode}; seed::Float32=1.0f0)::Nothing
     result = last(order)
     result.gradient = seed
     @assert length(result.output) == 1 "Gradient is defined only for scalar functions"
@@ -18,9 +18,9 @@ function backward!(order::Vector; seed::Float32=1.0f0)
 end
 
 # Constant i Variable to zawsze liście (pozostałe węzły to zawsze Operator), na liściach się zatrzymujemy, dlatego nothing
-function backward!(node::Constant) end
-function backward!(node::Variable) end
-function backward!(node::Operator)
+function backward!(node::Constant{T})::Nothing where {T} end
+function backward!(node::Variable{T})::Nothing where {T} end
+function backward!(node::Operator)::Nothing
     gradients = backward(node, extract_input_values(node)..., node.gradient)
     for (input, gradient) in zip(node.inputs, gradients)
         update!(input, gradient)

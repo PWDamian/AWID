@@ -10,11 +10,11 @@ function (layer::MaxPool1D)(input_node::GraphNode)::GraphNode
     return maxpool1d(input_node, pool_size_node)
 end
 
-function parameters(layer::MaxPool1D)
+function parameters(layer::MaxPool1D)::Vector{Variable}
     return Variable[]
 end
 
-function layer_output_shape(layer::MaxPool1D, input_shape)
+function layer_output_shape(layer::MaxPool1D, input_shape::Tuple{Int,Int,Int})::Tuple{Int,Int,Int}
     channels, width, batch_size = input_shape
     out_width = fld(width, layer.pool_size)
     return (channels, out_width, batch_size)

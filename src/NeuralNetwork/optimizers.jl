@@ -12,15 +12,15 @@ mutable struct Adam <: Optimizer
     t::Int # Licznik kroków (iteracji)
 
     # m_value i v_value mają taki sam typ i kształt jak parametr.output
-    m::Dict{Variable,Any} # bezwładność, pierwszy moment
-    v::Dict{Variable,Any} # drugi moment (kwadrat gradientu)
+    m::Dict{Variable,AbstractArray{Float32}} # bezwładność, pierwszy moment
+    v::Dict{Variable,AbstractArray{Float32}} # drugi moment (kwadrat gradientu)
 
     function Adam(; lr::Float32=0.001f0, beta1::Float32=0.9f0, beta2::Float32=0.999f0, epsilon::Float32=eps(Float32))
-        new(lr, beta1, beta2, epsilon, 0, Dict{Variable,Any}(), Dict{Variable,Any}())
+        new(lr, beta1, beta2, epsilon, 0, Dict{Variable,AbstractArray{Float32}}(), Dict{Variable,AbstractArray{Float32}}())
     end
 end
 
-function update!(opt::Adam, params::Vector{<:Variable})
+function update!(opt::Adam, params::Vector{<:Variable})::Nothing
     opt.t += 1
 
     for p in params

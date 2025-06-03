@@ -2,7 +2,7 @@ module DataLoader
 
 using Random: shuffle
 
-function get_epoch_batches(X_data, Y_data; batch_size::Int, do_shuffle::Bool=false)
+function get_epoch_batches(X_data::AbstractMatrix{T}, Y_data::AbstractMatrix{S}; batch_size::Int, do_shuffle::Bool=false) where {T,S}
     num_samples = size(X_data, 2) # cechy(1) x próbki(2)
     indices = 1:num_samples
 

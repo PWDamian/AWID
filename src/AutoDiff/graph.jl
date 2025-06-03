@@ -1,4 +1,4 @@
-function visit(node::GraphNode, visited::Set, order::Vector)
+function visit(node::GraphNode, visited::Set{GraphNode}, order::Vector{GraphNode})
     if node ∈ visited
     else
         push!(visited, node)
@@ -7,7 +7,7 @@ function visit(node::GraphNode, visited::Set, order::Vector)
     return nothing
 end
 
-function visit(node::Operator, visited::Set, order::Vector)
+function visit(node::Operator, visited::Set{GraphNode}, order::Vector{GraphNode})
     if node ∈ visited
     else
         push!(visited, node)
@@ -19,7 +19,7 @@ function visit(node::Operator, visited::Set, order::Vector)
     return nothing
 end
 
-function topological_sort(head::GraphNode) # head - ostatni węzeł grafu obliczeniowego np. reprezentujący funkcję straty
+function topological_sort(head::GraphNode)::Vector{GraphNode} # head - ostatni węzeł grafu obliczeniowego np. reprezentujący funkcję straty
     visited = Set{GraphNode}()
     order = Vector{GraphNode}()
     visit(head, visited, order)

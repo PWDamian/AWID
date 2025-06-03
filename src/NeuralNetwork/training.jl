@@ -4,7 +4,7 @@ using ..AutoDiff: GraphNode, Constant, Variable, topological_sort, forward!, bac
 using ..Layers: Chain, parameters
 using ..Optimizers: Optimizer, update!
 
-function _train_on_batch(model::Chain, order::Vector, x_train_node::GraphNode, y_train_true_node::GraphNode, y_train_pred_node::GraphNode, accuracy_fn, optimizer::Optimizer, x_batch, y_batch)
+function _train_on_batch(model::Chain, order::Vector{GraphNode}, x_train_node::GraphNode, y_train_true_node::GraphNode, y_train_pred_node::GraphNode, accuracy_fn::Function, optimizer::Optimizer, x_batch::AbstractArray{<:Real}, y_batch::AbstractArray)::Tuple{Float32,Float32}
     x_train_node.output = x_batch
     y_train_true_node.output = y_batch
 
@@ -16,7 +16,7 @@ function _train_on_batch(model::Chain, order::Vector, x_train_node::GraphNode, y
     return loss, accuracy
 end
 
-function _test_loss_and_accuracy(order::Vector, y_pred_node::GraphNode, accuracy_fn, y_test)
+function _test_loss_and_accuracy(order::Vector{GraphNode}, y_pred_node::GraphNode, accuracy_fn::Function, y_test::AbstractArray)::Tuple{Float32,Float32}
     loss = forward!(order)
     accuracy = accuracy_fn(y_pred_node.output, y_test)
 
